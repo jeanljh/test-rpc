@@ -1,0 +1,62 @@
+name: Test JSON RPC
+
+on:
+  push:
+    branches:
+    - "*"
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 'stable'
+      - name: Download Sedge sources
+        run: |
+          echo "Downloading sedge sources..."
+          git clone https://github.com/NethermindEth/sedge.git src --branch main --single-branch
+          echo "Sources downloaded."
+          cd src
+          echo "Building sedge..."
+          make compile
+      - name: Verify Sedge executable
+        run: |
+          ls -al src/build/
+      - name: Run Sedge
+        run: |
+          echo 'Running sedge...'
+          cd src/build
+          ./sedge deps install >> $HOME/sedge.logs
+          ./sedge generate --logging none \
+          full-node --map-all --no-mev-boost --no-validator --network chiado \
+          -c lighthouse:sigp/lighthouse:latest -e nethermind:nethermindeth/nethermind:master \
+          --el-extra-flag Sync.NonValidatorNode=true --el-extra-flag Sync.DownloadBodiesInFastSync=false \
+          --el-extra-flag Sync.DownloadReceiptsInFastSync=false \
+          --cl-extra-flag checkpoint-sync-url=http://139.144.26.89:4000/ >> $HOME/sedge.logs
+          ./sedge run >> $HOME/sedge.logs
+      - name: Show Sedge logs
+        run: cat $HOME/sedge.logs
+      - name: Check status
+        run: sudo netstat -tulpn | grep LISTEN
+      - name: Install NPM packages
+        run: npm ci
+      - name: Run Playwright test
+        run: xvfb-run --auto-servernum -- npm run test:rpc
+      - name: Create Artillery test report directory
+        run: mkdir artillery-report
+      - name: Run Artillery test
+        run: npm run test:load    
+      - name: Upload Playwright and Artillery test reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: test-report
+          path: |
+            playwright-report
+            artillery-report
+          retention-days: 30
