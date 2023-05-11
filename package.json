@@ -1,0 +1,29 @@
+{
+  "name": "test-rpc",
+  "version": "1.0.0",
+  "description": "This is a JSON RPC test suite that includes API endpoint checking with Playwright and load tests wtih Artillery",
+  "main": "index.js",
+  "scripts": {
+    "test:rpc": "npx playwright test",
+    "test:load": "artillery run -o artillery-report/report.json load_test.yml && npm run test:report",
+    "test:report": "artillery report -o artillery-report/report.html artillery-report/report.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jeanljh/test-rpc.git"
+  },
+  "keywords": [
+    "playwright",
+    "artillery"
+  ],
+  "author": "jean",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jeanljh/test-rpc/issues"
+  },
+  "homepage": "https://github.com/jeanljh/test-rpc#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.33.0",
+    "artillery": "^2.0.0-31"
+  }
+}

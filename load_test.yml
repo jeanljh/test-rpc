@@ -1,0 +1,65 @@
+config:
+  target: "http://localhost:8545"
+  phases:
+    - name: Ramp up load
+      duration: 120
+      arrivalRate: 5
+      rampTo: 1000
+    - name: Sustained load
+      duration: 180
+      arrivalRate: 100
+    - name: Fixed load - 1000 users
+      duration: 120
+      arrivalCount: 1000
+    - name: Fixed load - 10000 users
+      duration: 120
+      arrivalCount: 10000
+
+scenarios:
+  - name: "Test 2: JSON-RPC Benchmark - eth_blockNumber"
+    flow:
+      - post:
+          url: "/"
+          json: 
+            jsonrpc: "2.0"
+            method: "eth_blockNumber"
+            params: []
+            id: 1
+          headers:
+            content-type: "application/json"
+          capture:
+            json: "$.result"
+            as: "blockNumber"
+      - think: 2
+
+  - name: "Test 2: JSON-RPC Benchmark - eth_getBlockByNumber"
+    flow:
+      - post:
+          url: "/"
+          json:
+            method: "eth_getBlockByNumber"
+            params: [{ BlockNumber: {{blockNumber}} }, true]
+            id: 1
+            jsonrpc: "2.0"
+          headers:
+            content-type: "application/json"
+      - think: 2
+
+  - name: "Test 3: Test Suite Extension for Selected Endpoint (performance) - eth_chainId"
+    flow:
+      - post:
+          url: "/"
+          json: 
+            jsonrpc: "2.0"
+            method: "eth_chainId"
+            params: []
+            id: 1
+          headers:
+            content-type: "application/json"
+      - think: 2
+
+
+
+
+
+
