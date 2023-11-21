@@ -1,7 +1,7 @@
 # test-json-rpc
 [![Test JSON RPC](https://github.com/jeanljh/test-rpc/actions/workflows/ci.yml/badge.svg)](https://github.com/jeanljh/test-rpc/actions/workflows/ci.yml)
 
-This is an example JSON RPC test suite that includes API endpoint checking with Playwright and load tests wtih Artillery
+This is an example of JSON RPC test suite that includes API endpoint checking with Playwright and load tests with Artillery
 
 ## ⚙Setup and run
 * Run from Github Actions
